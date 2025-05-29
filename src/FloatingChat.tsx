@@ -44,6 +44,7 @@ interface FloatingChatProps {
   buttonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
   userName?: string;
   botName?: string;
+  askedQuestions?: string[];
 }
 
 const defaultStyles: StyleProps = {
@@ -88,6 +89,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
   buttonProps = {},
   userName = 'You',
   botName = 'Bot',
+  askedQuestions = [],
 }) => {
   const mergedStyles = { ...defaultStyles, ...styles };
 
@@ -103,9 +105,17 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      onSendMessage?.(message);
+      const newMessage: Message = { text: message.trim(), sender: 'user' };
+      setMessages((prev) => [...prev, newMessage]);
+      onSendMessage?.(message.trim());
       setMessage('');
     }
+  };
+
+  const handleQuestionClick = (q: string) => {
+    const newMessage: Message = { text: q, sender: 'user' };
+    setMessages((prev) => [...prev, newMessage]);
+    onSendMessage?.(q);
   };
 
   useEffect(() => {
@@ -114,7 +124,6 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
     }
   }, [messagesProp]);
 
-  // 🧷 Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -226,15 +235,19 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                    alignItems:
+                      msg.sender === 'user' ? 'flex-end' : 'flex-start',
                   }}
                 >
-                  <span style={{ fontSize: 12, color: '#888', marginBottom: 2 }}>
+                  <span
+                    style={{ fontSize: 12, color: '#888', marginBottom: 2 }}
+                  >
                     {msg.sender === 'user' ? userName : botName}
                   </span>
                   <div
                     style={{
-                      alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                      alignSelf:
+                        msg.sender === 'user' ? 'flex-end' : 'flex-start',
                       backgroundColor:
                         msg.sender === 'user' ? '#007bff' : '#f1f1f1',
                       color: msg.sender === 'user' ? '#fff' : '#000',
@@ -264,43 +277,75 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
             <div
               style={{
                 display: 'flex',
-                padding: '10px',
+                flexDirection: 'column',
                 borderTop: '1px solid #ddd',
                 ...mergedStyles.inputWrapper,
               }}
             >
-              <input
-                value={message}
-                onChange={handleMessageChange}
-                placeholder={messagePlaceholder}
-                style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  borderRadius: 20,
-                  border: '1px solid #ccc',
-                  outline: 'none',
-                  fontSize: 14,
-                  ...mergedStyles.input,
-                }}
-                {...inputProps}
-              />
-              <button
-                onClick={handleSendMessage}
-                style={{
-                  marginLeft: 8,
-                  backgroundColor: '#007bff',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 20,
-                  padding: '8px 16px',
-                  cursor: 'pointer',
-                  fontSize: 14,
-                  ...mergedStyles.sendButton,
-                }}
-                {...buttonProps}
-              >
-                {sendButtonText}
-              </button>
+              {askedQuestions.length > 0 && (
+                <div
+                  style={{
+                    display: 'flex',
+                    overflowX: 'auto',
+                    padding: '8px 4px',
+                    gap: 8,
+                    marginBottom: 8,
+                  }}
+                >
+                  {askedQuestions.map((q, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleQuestionClick(q)}
+                      style={{
+                        whiteSpace: 'nowrap',
+                        padding: '6px 12px',
+                        borderRadius: 20,
+                        border: '1px solid #ccc',
+                        backgroundColor: '#f9f9f9',
+                        cursor: 'pointer',
+                        fontSize: 14,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div style={{ display: 'flex' }}>
+                <input
+                  value={message}
+                  onChange={handleMessageChange}
+                  placeholder={messagePlaceholder}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: 20,
+                    border: '1px solid #ccc',
+                    outline: 'none',
+                    fontSize: 14,
+                    ...mergedStyles.input,
+                  }}
+                  {...inputProps}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  style={{
+                    marginLeft: 8,
+                    backgroundColor: '#007bff',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 20,
+                    padding: '8px 16px',
+                    cursor: 'pointer',
+                    fontSize: 14,
+                    ...mergedStyles.sendButton,
+                  }}
+                  {...buttonProps}
+                >
+                  {sendButtonText}
+                </button>
+              </div>
             </div>
           )}
         </div>
