@@ -41,6 +41,8 @@ interface FloatingChatProps {
   messageStyle?: (message: Message) => CSSProperties;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   buttonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+  userName?: string;
+  botName?: string;
 }
 
 const defaultStyles: StyleProps = {
@@ -83,6 +85,8 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
   messageStyle,
   inputProps = {},
   buttonProps = {},
+  userName = 'You',
+  botName = 'Bot',
 }) => {
   const mergedStyles = { ...defaultStyles, ...styles };
 
@@ -218,23 +222,34 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
                 <div
                   key={i}
                   style={{
-                    alignSelf:
-                      msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                    backgroundColor:
-                      msg.sender === 'user' ? '#007bff' : '#f1f1f1',
-                    color: msg.sender === 'user' ? '#fff' : '#000',
-                    padding: '8px 12px',
-                    borderRadius: 12,
-                    maxWidth: '80%',
-                    fontSize: 14,
-                    whiteSpace: 'pre-wrap',
-                    ...(msg.sender === 'user'
-                      ? mergedStyles.userMessage
-                      : mergedStyles.botMessage),
-                    ...(messageStyle ? messageStyle(msg) : {}),
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                   }}
                 >
-                  {msg.text}
+                  <span style={{ fontSize: 12, color: '#888', marginBottom: 2 }}>
+                    {msg.sender === 'user' ? userName : botName}
+                  </span>
+                  <div
+                    style={{
+                      alignSelf:
+                        msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                      backgroundColor:
+                        msg.sender === 'user' ? '#007bff' : '#f1f1f1',
+                      color: msg.sender === 'user' ? '#fff' : '#000',
+                      padding: '8px 12px',
+                      borderRadius: 12,
+                      maxWidth: '80%',
+                      fontSize: 14,
+                      whiteSpace: 'pre-wrap',
+                      ...(msg.sender === 'user'
+                        ? mergedStyles.userMessage
+                        : mergedStyles.botMessage),
+                      ...(messageStyle ? messageStyle(msg) : {}),
+                    }}
+                  >
+                    {msg.text}
+                  </div>
                 </div>
               ))}
               <div ref={messagesEndRef} />

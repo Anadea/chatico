@@ -43,7 +43,9 @@ var FloatingChat = ({
   containerStyle = {},
   messageStyle,
   inputProps = {},
-  buttonProps = {}
+  buttonProps = {},
+  userName = "You",
+  botName = "Bot"
 }) => {
   const mergedStyles = { ...defaultStyles, ...styles };
   const [isOpen, setIsOpen] = useState(false);
@@ -173,22 +175,35 @@ var FloatingChat = ({
                         ...mergedStyles.messagesWrapper
                       },
                       children: [
-                        messages.map((msg, i) => /* @__PURE__ */ jsx(
+                        messages.map((msg, i) => /* @__PURE__ */ jsxs(
                           "div",
                           {
                             style: {
-                              alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
-                              backgroundColor: msg.sender === "user" ? "#007bff" : "#f1f1f1",
-                              color: msg.sender === "user" ? "#fff" : "#000",
-                              padding: "8px 12px",
-                              borderRadius: 12,
-                              maxWidth: "80%",
-                              fontSize: 14,
-                              whiteSpace: "pre-wrap",
-                              ...msg.sender === "user" ? mergedStyles.userMessage : mergedStyles.botMessage,
-                              ...messageStyle ? messageStyle(msg) : {}
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: msg.sender === "user" ? "flex-end" : "flex-start"
                             },
-                            children: msg.text
+                            children: [
+                              /* @__PURE__ */ jsx("span", { style: { fontSize: 12, color: "#888", marginBottom: 2 }, children: msg.sender === "user" ? userName : botName }),
+                              /* @__PURE__ */ jsx(
+                                "div",
+                                {
+                                  style: {
+                                    alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
+                                    backgroundColor: msg.sender === "user" ? "#007bff" : "#f1f1f1",
+                                    color: msg.sender === "user" ? "#fff" : "#000",
+                                    padding: "8px 12px",
+                                    borderRadius: 12,
+                                    maxWidth: "80%",
+                                    fontSize: 14,
+                                    whiteSpace: "pre-wrap",
+                                    ...msg.sender === "user" ? mergedStyles.userMessage : mergedStyles.botMessage,
+                                    ...messageStyle ? messageStyle(msg) : {}
+                                  },
+                                  children: msg.text
+                                }
+                              )
+                            ]
                           },
                           i
                         )),

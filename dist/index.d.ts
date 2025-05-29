@@ -32,6 +32,8 @@ interface FloatingChatProps {
     messageStyle?: (message: Message) => CSSProperties;
     inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
     buttonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+    userName?: string;
+    botName?: string;
 }
 declare const FloatingChat: React.FC<FloatingChatProps>;
 
