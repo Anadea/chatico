@@ -34,7 +34,7 @@ interface FloatingChatProps {
   headerText?: string;
   sendButtonText?: string;
   botDefaultReply?: string;
-  messagesProp?: Message[]; // ⬅️ НОВА пропса
+  messagesProp?: Message[];
   styles?: StyleProps;
   customHeader?: ReactNode;
   customFooter?: ReactNode;
@@ -78,8 +78,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
   openButtonText = '✖',
   headerText = 'Chat',
   sendButtonText = 'Send',
-  botDefaultReply = 'This is a bot response.',
-  messagesProp = [], // ⬅️ НОВА пропса за замовчуванням
+  messagesProp = [],
   styles = {},
   customHeader,
   customFooter,
@@ -94,6 +93,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
 
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const toggleChat = () => setIsOpen((prev) => !prev);
@@ -103,14 +103,21 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      if (onSendMessage) onSendMessage(message);
+      onSendMessage?.(message);
       setMessage('');
     }
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (Array.isArray(messagesProp)) {
+      setMessages(messagesProp);
+    }
   }, [messagesProp]);
+
+  // 🧷 Scroll to bottom on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   return (
     <div
@@ -156,6 +163,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
             ...mergedStyles.container,
           }}
         >
+          {/* Header */}
           {customHeader ? (
             <div>{customHeader}</div>
           ) : (
@@ -195,6 +203,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
             </div>
           )}
 
+          {/* Body */}
           <div
             style={{
               flex: 1,
@@ -211,7 +220,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
                 ...mergedStyles.messagesWrapper,
               }}
             >
-              {messagesProp.map((msg, i) => (
+              {messages.map((msg, i) => (
                 <div
                   key={i}
                   style={{
@@ -248,6 +257,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
             </div>
           </div>
 
+          {/* Footer */}
           {customFooter ? (
             <div>{customFooter}</div>
           ) : (
