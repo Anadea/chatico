@@ -34,6 +34,7 @@ interface FloatingChatProps {
   headerText?: string;
   sendButtonText?: string;
   botDefaultReply?: string;
+  messagesProp?: Message[]; // ⬅️ НОВА пропса
   styles?: StyleProps;
   customHeader?: ReactNode;
   customFooter?: ReactNode;
@@ -78,6 +79,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
   headerText = 'Chat',
   sendButtonText = 'Send',
   botDefaultReply = 'This is a bot response.',
+  messagesProp = [], // ⬅️ НОВА пропса за замовчуванням
   styles = {},
   customHeader,
   customFooter,
@@ -92,7 +94,6 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
 
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const toggleChat = () => setIsOpen((prev) => !prev);
@@ -102,22 +103,14 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      const newMessage: Message = { text: message, sender: 'user' };
-      setMessages((prev) => [...prev, newMessage]);
-      setMessage('');
-
       if (onSendMessage) onSendMessage(message);
-
-      setTimeout(() => {
-        const botMessage: Message = { text: botDefaultReply, sender: 'bot' };
-        setMessages((prev) => [...prev, botMessage]);
-      }, 1000);
+      setMessage('');
     }
   };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messagesProp]);
 
   return (
     <div
@@ -218,7 +211,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
                 ...mergedStyles.messagesWrapper,
               }}
             >
-              {messages.map((msg, i) => (
+              {messagesProp.map((msg, i) => (
                 <div
                   key={i}
                   style={{
@@ -232,8 +225,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({
                   </span>
                   <div
                     style={{
-                      alignSelf:
-                        msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                      alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                       backgroundColor:
                         msg.sender === 'user' ? '#007bff' : '#f1f1f1',
                       color: msg.sender === 'user' ? '#fff' : '#000',
