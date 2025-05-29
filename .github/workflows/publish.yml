@@ -44,7 +44,7 @@ jobs:
         if: steps.version-check.outputs.publish == 'true'
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.AUTOMATIONTOKEN }}
 
       - name: Push Git tag
         if: steps.version-check.outputs.publish == 'true'
